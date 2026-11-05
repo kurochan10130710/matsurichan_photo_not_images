@@ -1169,8 +1169,9 @@
     // 画像サイズを縮小・圧縮してからBase64に変換する処理
     async function uploadImage(key, input) {
       if (input.files && input.files[0]) {
+        // グローバルに保持された currentUserUid と storage をチェック
         if (!currentUserUid || !storage) {
-          alert('ログインしていないため、画像をアップロードできません。');
+          alert('ログインしていないか、初期化が完了していません。ログインし直してください。');
           return;
         }
         showLoader("画像をアップロード中...");
@@ -1203,19 +1204,12 @@
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
 
-            // CanvasをBlob（JPEG）に変換
             canvas.toBlob(async (blob) => {
               try {
-                // Storage上の保存先パス（例: users/ユーザーUID/photos/キー名_タイムスタンプ.jpg）
                 const storageRef = ref(storage, `users/${currentUserUid}/photos/${key}_${Date.now()}.jpg`);
-                
-                // Storageへアップロード
                 await uploadBytes(storageRef, blob);
-                
-                // 閲覧用の公開URLを取得
                 const downloadURL = await getDownloadURL(storageRef);
 
-                // 状態にはURL文字列を保持
                 window.userState.images[key] = downloadURL;
                 renderPhotos();
                 renderMissingPhotos();
@@ -1633,7 +1627,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    // 追加：Storage関連のモジュールをインポート
     import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
     const firebaseConfig = {
@@ -1646,54 +1639,15 @@
       measurementId: "G-EFR1KNT1F3"
     };
 
-    let app, auth, db, storage;
+    let app;
     try {
       app = initializeApp(firebaseConfig);
       auth = getAuth(app);
       db = getFirestore(app);
-      storage = getStorage(app); // 追加
+      storage = getStorage(app); // グローバル変数に格納
     } catch (e) {
       console.warn("Firebaseの初期化に失敗しました:", e);
     }
-
-    let currentUserUid = null;
-
-    window.handleAuthClick = async () => {
-      if (!auth) {
-        alert('Firebaseが正しく初期化されていません。ローカルサーバー経由で開いているか確認してください。');
-        return;
-      }
-      const user = auth.currentUser;
-      if (user) {
-        if (confirm('ログアウトしますか？')) {
-          try {
-            await signOut(auth);
-            window.userState = { counts: {}, images: {} };
-            renderPhotos();
-            renderMissingPhotos();
-            updateDashboard();
-            alert('ログアウトしました');
-          } catch (e) {
-            console.error("ログアウトエラー:", e);
-          }
-        }
-      } else {
-        const provider = new GoogleAuthProvider();
-        showLoader("Googleログイン中...");
-        try {
-          await signInWithPopup(auth, provider);
-          hideLoader();
-        } catch (error) {
-          hideLoader();
-          if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
-            console.log("ログイン画面が閉じられました");
-          } else {
-            console.error("ログインエラー:", error);
-            alert("ログインに失敗しました: " + error.message);
-          }
-        }
-      }
-    };
 
     if (auth) {
       onAuthStateChanged(auth, async (user) => {
@@ -1701,7 +1655,7 @@
         const imageModeBtn = document.getElementById('imageModeBtn');
 
         if (user) {
-          currentUserUid = user.uid;
+          currentUserUid = user.uid; // グローバル変数にUIDを格納
           if (authBtn) authBtn.textContent = 'ログアウト';
           if (imageModeBtn) imageModeBtn.style.display = 'inline-block';
 
@@ -1723,7 +1677,7 @@
           updateDashboard();
           hideLoader();
         } else {
-          currentUserUid = null;
+          currentUserUid = null; // ログアウト時は初期化
           if (authBtn) authBtn.textContent = 'Googleでログイン';
           if (imageModeBtn) imageModeBtn.style.display = 'none';
           window.hasImageAccess = false;
@@ -1745,7 +1699,7 @@
       try {
         await setDoc(doc(db, "users", currentUserUid), {
           counts: window.userState.counts,
-          images: window.userState.images, // ここにはStorageのURLが保存されます
+          images: window.userState.images,
           updatedAt: new Date()
         }, { merge: true });
 
