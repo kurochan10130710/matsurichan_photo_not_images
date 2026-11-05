@@ -640,6 +640,11 @@
 
   <!-- アプリ本体のデータ & 関数スクリプト (Firebaseより先に定義してReferenceErrorを防止) -->
   <script>
+    let currentUserUid = null;
+    let auth = null;
+    let storage = null;
+    let db = null;
+    
     const DEFAULT_POSES = ['ヨリ', 'チュウ', '座り', 'ヒキ'];
     const IMAGE_BASE_URL = new URL("./images/", document.baseURI).href;
     const SUPPORTED_EXTENSIONS = ['jpg', 'png', 'heic', 'jpeg', 'webp'];
