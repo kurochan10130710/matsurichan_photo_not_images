@@ -1211,9 +1211,10 @@
 
             canvas.toBlob(async (blob) => {
               try {
-                const storageRef = ref(storage, `users/${currentUserUid}/photos/${key}_${Date.now()}.jpg`);
-                await uploadBytes(storageRef, blob);
-                const downloadURL = await getDownloadURL(storageRef);
+                // ▼ window経由で呼び出すように変更
+                const storageRef = window.firebaseStorageRef(storage, `users/${currentUserUid}/photos/${key}_${Date.now()}.jpg`);
+                await window.firebaseUploadBytes(storageRef, blob);
+                const downloadURL = await window.firebaseGetDownloadURL(storageRef);
 
                 window.userState.images[key] = downloadURL;
                 renderPhotos();
