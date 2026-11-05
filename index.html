@@ -1632,7 +1632,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+    import { getStorage, ref as storageRefFn, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBb-19ERvZ2c4nxRokO2RRUoqaVgQMeW4s",
@@ -1649,12 +1649,16 @@
       app = initializeApp(firebaseConfig);
       auth = getAuth(app);
       db = getFirestore(app);
-      storage = getStorage(app); // グローバル変数に格納
+      storage = getStorage(app);
     } catch (e) {
       console.warn("Firebaseの初期化に失敗しました:", e);
     }
 
-    // ▼ Googleログイン・ログアウト処理をグローバル関数として定義
+    // ▼ uploadImage関数などから呼び出せるように window にバインドする
+    window.firebaseStorageRef = storageRefFn;
+    window.firebaseUploadBytes = uploadBytes;
+    window.firebaseGetDownloadURL = getDownloadURL;
+
     window.handleAuthClick = async () => {
       if (!auth) {
         alert('Firebaseが正しく初期化されていません。ローカルサーバー経由で開いているか確認してください。');
@@ -1698,7 +1702,7 @@
         const imageModeBtn = document.getElementById('imageModeBtn');
 
         if (user) {
-          currentUserUid = user.uid; // グローバル変数にUIDを格納
+          currentUserUid = user.uid;
           if (authBtn) authBtn.textContent = 'ログアウト';
           if (imageModeBtn) imageModeBtn.style.display = 'inline-block';
 
@@ -1720,7 +1724,7 @@
           updateDashboard();
           hideLoader();
         } else {
-          currentUserUid = null; // ログアウト時は初期化
+          currentUserUid = null;
           if (authBtn) authBtn.textContent = 'Googleでログイン';
           if (imageModeBtn) imageModeBtn.style.display = 'none';
           window.hasImageAccess = false;
