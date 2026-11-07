@@ -589,6 +589,94 @@
       flex-shrink: 0;
     }
 
+    /* トレード予定スタイル */
+    .schedule-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+      background: #F8FAFC;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+    .form-input, .form-select, .form-textarea {
+      padding: 8px 12px;
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      outline: none;
+      background: #FFF;
+      color: var(--text-dark);
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--accent-blue);
+    }
+    .trade-plan-card {
+      background: #FFF;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .trade-plan-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 6px;
+    }
+    .trade-plan-partner {
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+    }
+    .trade-plan-method-badge {
+      background: #E2E8F0;
+      color: var(--text-dark);
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+    }
+    .trade-plan-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      font-size: 0.82rem;
+    }
+    .trade-plan-box {
+      background: #F8FAFC;
+      padding: 8px;
+      border-radius: 6px;
+    }
+    .trade-plan-box-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+    .trade-plan-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+    }
+
     /* 共通モーダル（プライバシーポリシー・使い方） */
     .modal-backdrop {
       position: fixed;
@@ -671,6 +759,7 @@
       .trade-table { font-size: 0.7rem; }
       .trade-table th, .trade-table td { padding: 5px 2px; }
       .missing-table-img { width: 24px; height: 36px; }
+      .trade-plan-details { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -701,7 +790,7 @@
           <img src="icon/yosiko.jpg" alt="アイコン" class="site-header-icon" onerror="this.style.display='none'">
           松田里奈ちゃん専用 生写真管理ツール
           <!-- タイトル隣のバージョン表記（数値変更可能） -->
-          <span class="app-version">v4.0.1</span>
+          <span class="app-version">v4.1.0</span>
         </a>
       </div>
       <div class="user-area">
@@ -722,6 +811,7 @@
       <li class="menu-nav-item"><button onclick="switchTabFromMenu('collection')">全生写真一覧📖</button></li>
       <li class="menu-nav-item"><button onclick="switchTabFromMenu('missing')">未所持の生写真一覧💭</button></li>
       <li class="menu-nav-item"><button onclick="switchTabFromMenu('trade')">トレード管理🔁</button></li>
+      <li class="menu-nav-item"><button onclick="switchTabFromMenu('schedule')">トレード予定📅</button></li>
       <li class="menu-nav-item" style="margin-top: 10px;"><button onclick="openHelpModal()" style="background:#EFF6FF; color:#1E40AF; border-color:#BFDBFE;"> 当ツールの使い方</button></li>
       <li class="menu-nav-item"><button onclick="openPrivacyModal()"> プライバシーポリシー</button></li>
     </ul>
@@ -735,6 +825,7 @@
     <button class="tab-btn active" id="btnTabCollection" onclick="switchTab('collection', this)">全生写真一覧</button>
     <button class="tab-btn" id="btnTabMissing" onclick="switchTab('missing', this)">未所持の生写真一覧</button>
     <button class="tab-btn" id="btnTabTrade" onclick="switchTab('trade', this)">トレード管理</button>
+    <button class="tab-btn" id="btnTabSchedule" onclick="switchTab('schedule', this)">トレード予定</button>
   </div>
 
   <div class="container">
@@ -866,6 +957,53 @@
         </div>
       </div>
     </div>
+
+    <!-- トレード予定タブ -->
+    <div id="tab-schedule" style="display:none;">
+      <div class="trade-section">
+        <h3 style="margin-bottom: 16px;">
+          <span>📝 新規トレード予定の追加</span>
+        </h3>
+        <form id="scheduleAddForm" class="schedule-form" onsubmit="addTradeSchedule(event)">
+          <div class="form-group">
+            <label>相手の名前</label>
+            <input type="text" id="schPartner" class="form-input" placeholder="例: さくら太郎" required>
+          </div>
+          <div class="form-group">
+            <label>相手から頂くもの</label>
+            <input type="text" id="schReceive" class="form-input" placeholder="例: 桜月ヨリ、BAN座り" required>
+          </div>
+          <div class="form-group">
+            <label>自分が提供するもの</label>
+            <input type="text" id="schProvide" class="form-input" placeholder="例: 五月雨よヒキ" required>
+          </div>
+          <div class="form-group">
+            <label>取引方法</label>
+            <select id="schMethodType" class="form-select" onchange="toggleMethodDetailInput(this.value)">
+              <option value="郵送">郵送</option>
+              <option value="現地">現地（場所と日程）</option>
+              <option value="その他">その他（自由記述）</option>
+            </select>
+          </div>
+          <div class="form-group" id="schMethodDetailGroup" style="display:none; grid-column: 1 / -1;">
+            <label id="schMethodDetailLabel">現地（場所と日程）</label>
+            <input type="text" id="schMethodDetail" class="form-input" placeholder="例: 11/25 幕張メッセ 会場手渡し">
+          </div>
+          <div style="grid-column: 1 / -1; text-align: right; margin-top: 4px;">
+            <button type="submit" class="btn-trade-action" style="background:var(--accent-blue);">トレード予定を追加</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="trade-section">
+        <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border-light); padding-bottom: 10px;">
+          <button class="filter-btn active" id="btnSchTabActive" onclick="switchScheduleSubTab('active', this)">トレード予定 (<span id="countSchActive">0</span>)</button>
+          <button class="filter-btn" id="btnSchTabCompleted" onclick="switchScheduleSubTab('completed', this)">完了済み (<span id="countSchCompleted">0</span>)</button>
+        </div>
+
+        <div id="scheduleListContainer"></div>
+      </div>
+    </div>
   </div>
 
   <!-- プライバシーポリシー モーダル -->
@@ -913,6 +1051,9 @@
 
         <h4>4. トレード募集文の作成</h4>
         <p>「トレード管理」タブから求める生写真にチェックを入れて「トレード文を生成」を押すと、X（旧Twitter）投稿用の交換文章を自動生成・コピーできます。</p>
+
+        <h4>5. トレード予定の管理</h4>
+        <p>「トレード予定」タブで取引相手や提供品、取引方法（郵送・現地など）を登録・管理できます。「取引完了」を押すと即座に完了済みタブへ移動し、自動保存されます。</p>
       </div>
       <div class="modal-footer">
         <button class="btn-auth" onclick="closeHelpModal()">閉じる</button>
@@ -1147,11 +1288,12 @@
       { id: 'sakura_past_cdtv_xmas', name: '過去衣装（Buddies感謝祭2025EX ライブ衣装）', kana: 'かこいしょうばでぃーずかんしゃさいらいぶいしょう', group: '櫻坂', type: '通常', year: 2026 },
     ];
 
-    window.userState = { counts: {}, images: {} };
+    window.userState = { counts: {}, images: {}, tradeSchedules: [] };
     let currentGroupFilter = 'all';
     let currentTypeFilter = 'all';
     let currentSortOrder = 'asc';
     let currentYearFilter = 'all';
+    let currentScheduleSubTab = 'active';
     let imageDisplayStates = {};
 
     /* 無断画像保存・右クリック・長押し無効化処理 */
@@ -1187,6 +1329,7 @@
       let btnEl = document.getElementById('btnTabCollection');
       if (tabName === 'missing') btnEl = document.getElementById('btnTabMissing');
       if (tabName === 'trade') btnEl = document.getElementById('btnTabTrade');
+      if (tabName === 'schedule') btnEl = document.getElementById('btnTabSchedule');
       switchTab(tabName, btnEl);
     }
 
@@ -1279,6 +1422,7 @@
       renderMarquee();
       renderPhotos();
       renderMissingPhotos();
+      renderTradeScheduleList();
       updateDashboard();
       setTimeout(() => { hideLoader(); }, 400);
     });
@@ -1652,10 +1796,12 @@
         document.getElementById('tab-collection').style.display = tab === 'collection' ? 'block' : 'none';
         document.getElementById('tab-missing').style.display = tab === 'missing' ? 'block' : 'none';
         document.getElementById('tab-trade').style.display = tab === 'trade' ? 'block' : 'none';
+        document.getElementById('tab-schedule').style.display = tab === 'schedule' ? 'block' : 'none';
         document.querySelectorAll('.nav-tabs .tab-btn').forEach(b => b.classList.remove('active'));
         if (btn) btn.classList.add('active');
         if (tab === 'missing') renderMissingPhotos();
         if (tab === 'trade') renderTradePage();
+        if (tab === 'schedule') renderTradeScheduleList();
         hideLoader();
       }, 50);
     }
@@ -1933,6 +2079,146 @@
         downloadCanvasImage(canvas, 'matsuda_trade_table.png');
       }, 100);
     }
+
+    /* トレード予定機能 */
+    function toggleMethodDetailInput(type) {
+      const group = document.getElementById('schMethodDetailGroup');
+      const label = document.getElementById('schMethodDetailLabel');
+      const input = document.getElementById('schMethodDetail');
+      if (type === '郵送') {
+        group.style.display = 'none';
+        input.removeAttribute('required');
+      } else {
+        group.style.display = 'flex';
+        input.setAttribute('required', 'required');
+        if (type === '現地') {
+          label.textContent = '現地（場所と日程を記載）';
+          input.placeholder = '例: 11/25 幕張メッセ 会場手渡し';
+        } else {
+          label.textContent = 'その他（詳細記述）';
+          input.placeholder = '例: 都内手渡し、メルカリ経由など';
+        }
+      }
+    }
+
+    async function addTradeSchedule(e) {
+      e.preventDefault();
+      const partner = document.getElementById('schPartner').value.trim();
+      const receive = document.getElementById('schReceive').value.trim();
+      const provide = document.getElementById('schProvide').value.trim();
+      const methodType = document.getElementById('schMethodType').value;
+      const methodDetail = document.getElementById('schMethodDetail').value.trim();
+
+      if (!partner || !receive || !provide) return;
+
+      const newPlan = {
+        id: 'trade_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+        partner,
+        receive,
+        provide,
+        methodType,
+        methodDetail: methodType === '郵送' ? '' : methodDetail,
+        completed: false,
+        createdAt: new Date().toISOString()
+      };
+
+      if (!window.userState.tradeSchedules) window.userState.tradeSchedules = [];
+      window.userState.tradeSchedules.unshift(newPlan);
+
+      document.getElementById('scheduleAddForm').reset();
+      toggleMethodDetailInput('郵送');
+      renderTradeScheduleList();
+
+      if (typeof window.saveUserData === 'function') {
+        await window.saveUserData(true);
+      }
+    }
+
+    function switchScheduleSubTab(subTab, btn) {
+      currentScheduleSubTab = subTab;
+      document.querySelectorAll('#tab-schedule .filter-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderTradeScheduleList();
+    }
+
+    async function toggleTradeScheduleComplete(id) {
+      if (!window.userState.tradeSchedules) return;
+      const plan = window.userState.tradeSchedules.find(p => p.id === id);
+      if (plan) {
+        plan.completed = !plan.completed;
+        renderTradeScheduleList();
+        if (typeof window.saveUserData === 'function') {
+          await window.saveUserData(true);
+        }
+      }
+    }
+
+    async function deleteTradeSchedule(id) {
+      if (!confirm('このトレード予定を削除してもよろしいですか？')) return;
+      if (!window.userState.tradeSchedules) return;
+      window.userState.tradeSchedules = window.userState.tradeSchedules.filter(p => p.id !== id);
+      renderTradeScheduleList();
+      if (typeof window.saveUserData === 'function') {
+        await window.saveUserData(true);
+      }
+    }
+
+    function renderTradeScheduleList() {
+      const container = document.getElementById('scheduleListContainer');
+      const elCountActive = document.getElementById('countSchActive');
+      const elCountCompleted = document.getElementById('countSchCompleted');
+      if (!container) return;
+
+      const schedules = window.userState.tradeSchedules || [];
+      const activeList = schedules.filter(p => !p.completed);
+      const completedList = schedules.filter(p => p.completed);
+
+      if (elCountActive) elCountActive.textContent = activeList.length;
+      if (elCountCompleted) elCountCompleted.textContent = completedList.length;
+
+      const targetList = currentScheduleSubTab === 'active' ? activeList : completedList;
+
+      if (targetList.length === 0) {
+        container.innerHTML = `<p style="text-align:center; padding:30px; color:var(--text-muted); font-size:0.85rem;">${currentScheduleSubTab === 'active' ? '現在予定されているトレードはありません。' : '完了済みのトレードはありません。'}</p>`;
+        return;
+      }
+
+      let html = '';
+      targetList.forEach(plan => {
+        let methodStr = plan.methodType;
+        if (plan.methodType !== '郵送' && plan.methodDetail) {
+          methodStr += ` (${plan.methodDetail})`;
+        }
+
+        html += `
+          <div class="trade-plan-card">
+            <div class="trade-plan-header">
+              <span class="trade-plan-partner">👤 相手: ${plan.partner} 様</span>
+              <span class="trade-plan-method-badge">${methodStr}</span>
+            </div>
+            <div class="trade-plan-details">
+              <div class="trade-plan-box">
+                <div class="trade-plan-box-title">🎁 頂くもの</div>
+                <div style="font-weight:700; color:var(--keyaki-green);">${plan.receive}</div>
+              </div>
+              <div class="trade-plan-box">
+                <div class="trade-plan-box-title">📤 提供するもの</div>
+                <div style="font-weight:700; color:var(--sakura-pink);">${plan.provide}</div>
+              </div>
+            </div>
+            <div class="trade-plan-footer">
+              <button onclick="deleteTradeSchedule('${plan.id}')" style="background:none; border:none; color:var(--text-muted); font-size:0.75rem; cursor:pointer; text-decoration:underline;">削除</button>
+              ${!plan.completed 
+                ? `<button class="btn-trade-action" onclick="toggleTradeScheduleComplete('${plan.id}')" style="padding: 4px 14px; font-size: 0.75rem; background:var(--keyaki-green);">取引完了にする ✓</button>`
+                : `<button class="btn-trade-action" onclick="toggleTradeScheduleComplete('${plan.id}')" style="padding: 4px 14px; font-size: 0.75rem; background:var(--text-muted);">未完了に戻す</button>`
+              }
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
   </script>
 
   <!-- Firebase SDK -->
@@ -1972,9 +2258,10 @@
         if (confirm('ログアウトしますか？')) {
           try {
             await signOut(auth);
-            window.userState = { counts: {}, images: {} };
+            window.userState = { counts: {}, images: {}, tradeSchedules: [] };
             renderPhotos();
             renderMissingPhotos();
+            renderTradeScheduleList();
             updateDashboard();
             alert('ログアウトしました');
           } catch (e) {
@@ -2013,23 +2300,29 @@
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
               const data = docSnap.data();
-              window.userState = { counts: data.counts || {}, images: data.images || {} };
+              window.userState = { 
+                counts: data.counts || {}, 
+                images: data.images || {},
+                tradeSchedules: data.tradeSchedules || []
+              };
             } else {
-              window.userState = { counts: {}, images: {} };
+              window.userState = { counts: {}, images: {}, tradeSchedules: [] };
             }
           } catch (e) {
             console.error("データ取得エラー:", e);
           }
           renderPhotos();
           renderMissingPhotos();
+          renderTradeScheduleList();
           updateDashboard();
           hideLoader();
         } else {
           currentUserUid = null;
           if (authBtn) authBtn.textContent = 'Googleでログイン';
-          window.userState = { counts: {}, images: {} };
+          window.userState = { counts: {}, images: {}, tradeSchedules: [] };
           renderPhotos();
           renderMissingPhotos();
+          renderTradeScheduleList();
           updateDashboard();
           hideLoader();
         }
@@ -2046,6 +2339,7 @@
         await setDoc(doc(db, "users", currentUserUid), {
           counts: window.userState.counts,
           images: window.userState.images,
+          tradeSchedules: window.userState.tradeSchedules || [],
           updatedAt: new Date()
         });
         if (!isSilent) {
