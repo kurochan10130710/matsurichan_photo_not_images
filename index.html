@@ -967,15 +967,15 @@
         <form id="scheduleAddForm" class="schedule-form" onsubmit="addTradeSchedule(event)">
           <div class="form-group">
             <label>相手の名前</label>
-            <input type="text" id="schPartner" class="form-input" placeholder="例: さくら太郎" required>
+            <input type="text" id="schPartner" class="form-input" placeholder="例: SNS等のユーザー名" required>
           </div>
           <div class="form-group">
             <label>相手から頂くもの</label>
-            <input type="text" id="schReceive" class="form-input" placeholder="例: 桜月ヨリ、BAN座り" required>
+            <input type="text" id="schReceive" class="form-input" placeholder="例: メンバー名 名称 ポーズ、" required>
           </div>
           <div class="form-group">
             <label>自分が提供するもの</label>
-            <input type="text" id="schProvide" class="form-input" placeholder="例: 五月雨よヒキ" required>
+            <input type="text" id="schProvide" class="form-input" placeholder="例: メンバー名 名称 ポーズ" required>
           </div>
           <div class="form-group">
             <label>取引方法</label>
@@ -2093,10 +2093,10 @@
         input.setAttribute('required', 'required');
         if (type === '現地') {
           label.textContent = '現地（場所と日程を記載）';
-          input.placeholder = '例: 11/25 幕張メッセ 会場手渡し';
+          input.placeholder = '例: アニラ初日、リアルミーグリ、';
         } else {
           label.textContent = 'その他（詳細記述）';
-          input.placeholder = '例: 都内手渡し、メルカリ経由など';
+          input.placeholder = '例: 都内手渡し、フリマ経由など';
         }
       }
     }
@@ -2193,16 +2193,16 @@
         html += `
           <div class="trade-plan-card">
             <div class="trade-plan-header">
-              <span class="trade-plan-partner">👤 相手: ${plan.partner} 様</span>
+              <span class="trade-plan-partner">👤 取引相手: ${plan.partner} 様</span>
               <span class="trade-plan-method-badge">${methodStr}</span>
             </div>
             <div class="trade-plan-details">
               <div class="trade-plan-box">
-                <div class="trade-plan-box-title">🎁 頂くもの</div>
+                <div class="trade-plan-box-title">↓ 頂くもの</div>
                 <div style="font-weight:700; color:var(--keyaki-green);">${plan.receive}</div>
               </div>
               <div class="trade-plan-box">
-                <div class="trade-plan-box-title">📤 提供するもの</div>
+                <div class="trade-plan-box-title">↑ 提供するもの</div>
                 <div style="font-weight:700; color:var(--sakura-pink);">${plan.provide}</div>
               </div>
             </div>
