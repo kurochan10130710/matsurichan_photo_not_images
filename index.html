@@ -24,6 +24,19 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Noto Sans JP', sans-serif; }
 
+    /* 画像の保護 (右クリック・ドラッグ・選択不可) */
+    img {
+      -webkit-user-drag: none;
+      -khtml-user-drag: none;
+      -moz-user-drag: none;
+      -o-user-drag: none;
+      user-drag: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+
     body {
       background-color: var(--bg-white);
       color: var(--text-main);
@@ -103,18 +116,68 @@
       display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
     }
 
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* 左上メニューボタン */
+    .btn-menu-toggle {
+      background: #F1F5F9;
+      border: 1px solid var(--border-light);
+      color: var(--text-dark);
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-menu-toggle:hover {
+      background: #E2E8F0;
+    }
+
+    /* タイトルとバージョン */
     .site-title {
-      font-size: 1.4rem;
+      font-size: 1.25rem;
       font-weight: 900;
       color: var(--text-dark);
       letter-spacing: -0.02em;
+      text-decoration: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .site-title:hover {
+      opacity: 0.85;
+    }
+    /* タイトルのアイコン画像 */
+    .site-header-icon {
+      width: 28px;
+      height: 28px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 1px solid var(--border-light);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      flex-shrink: 0;
+    }
+    .app-version {
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: #E2E8F0;
+      color: var(--text-muted);
+      padding: 2px 6px;
+      border-radius: 8px;
+      vertical-align: middle;
     }
 
     .user-area { display: flex; align-items: center; gap: 10px; }
-
-    .user-badge {
-      display: none;
-    }
+    .user-badge { display: none; }
 
     .btn-auth {
       background: var(--text-dark);
@@ -122,6 +185,80 @@
       font-weight: 700; font-size: 0.82rem; cursor: pointer; transition: all 0.2s ease;
     }
     .btn-auth:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* サイドナビメニュー (ドロワー) */
+    .menu-drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .menu-drawer-backdrop.active {
+      display: block;
+      opacity: 1;
+    }
+    .menu-drawer {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 280px;
+      background: #FFF;
+      z-index: 1001;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+    .menu-drawer.active {
+      transform: translateX(0);
+    }
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 16px;
+    }
+    .menu-header-title {
+      font-weight: 900;
+      font-size: 1.1rem;
+      color: var(--text-dark);
+    }
+    .btn-close-menu {
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+    .menu-nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .menu-nav-item button {
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      background: #F8FAFC;
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      font-weight: 700;
+      color: var(--text-dark);
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-nav-item button:hover {
+      background: #E2E8F0;
+    }
 
     .nav-tabs {
       display: flex; gap: 8px; max-width: 1280px; margin: 16px auto; padding: 0 16px; overflow-x: auto;
@@ -332,7 +469,15 @@
     .poses-container { padding: 10px; display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(85px, 1fr)); }
     .pose-box { background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 12px; padding: 6px; text-align: center; }
     
-    .pose-img-wrapper { position: relative; width: 100%; aspect-ratio: 2 / 3; border-radius: 6px; overflow: hidden; background: #E2E8F0; margin-bottom: 4px; }
+    .pose-img-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 2 / 3;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #E2E8F0;
+      margin-bottom: 4px;
+    }
     .pose-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
     
     .sample-watermark {
@@ -444,10 +589,76 @@
       flex-shrink: 0;
     }
 
+    /* 共通モーダル（プライバシーポリシー・使い方） */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.active {
+      display: flex;
+    }
+    .modal-card {
+      background: #FFF;
+      border-radius: var(--radius-large);
+      max-width: 680px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+      overflow: hidden;
+    }
+    .modal-header {
+      padding: 16px 20px;
+      background: #F8FAFC;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-title {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--text-dark);
+    }
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.7;
+    }
+    .modal-body h4 {
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      margin: 16px 0 6px 0;
+    }
+    .modal-body h4:first-child {
+      margin-top: 0;
+    }
+    .modal-body ul, .modal-body ol {
+      padding-left: 20px;
+      margin-bottom: 12px;
+    }
+    .modal-footer {
+      padding: 12px 20px;
+      background: #F8FAFC;
+      border-top: 1px solid var(--border-light);
+      text-align: right;
+    }
+
     footer { margin-top: 40px; padding: 20px; text-align: center; font-size: 0.72rem; color: var(--text-muted); border-top: 1px solid var(--border-light); }
+    footer a { color: var(--accent-blue); text-decoration: underline; cursor: pointer; font-weight: 700; margin-left: 8px; }
 
     @media (max-width: 640px) {
-      .site-title { font-size: 1.15rem; }
+      .site-title { font-size: 1.05rem; }
       .header-container { padding: 10px 12px; }
       .save-action-bar { flex-direction: column; align-items: stretch; text-align: center; }
       .btn-save-batch { width: 100%; }
@@ -475,12 +686,24 @@
   </div>
 
   <div class="disclaimer-top">
-    ※当サイトは@MatsuMoriPikkanが運営する非公式サイトです。所属事務所・オフィシャル等とは一切関係ございません。
+    ※当サイトは@MatsuMoriPikkanが運営する非公式ファンサイトです。不具合や不明点があればXにてDMお願いいたします。
   </div>
 
   <header>
     <div class="header-container">
-      <div class="site-title">松田里奈ちゃん専用 生写真管理ツール</div>
+      <div class="header-left">
+        <!-- サイト左上 メニュータブボタン -->
+        <button class="btn-menu-toggle" onclick="toggleMenuDrawer(true)">
+          <span>☰</span> 
+        </button>
+        <!-- タイトルクリックでサイトトップへ戻る -->
+        <a href="#" class="site-title" onclick="scrollToTop(event)">
+          <img src="icon/yosiko.jpg" alt="アイコン" class="site-header-icon" onerror="this.style.display='none'">
+          松田里奈ちゃん専用 生写真管理ツール
+          <!-- タイトル隣のバージョン表記（数値変更可能） -->
+          <span class="app-version">v4.0.1</span>
+        </a>
+      </div>
       <div class="user-area">
         <span class="user-badge" id="userDisplay"></span>
         <button class="btn-auth" id="authBtn" onclick="handleAuthClick()">Googleでログイン</button>
@@ -488,21 +711,37 @@
     </div>
   </header>
 
+  <!-- 左上メニュータブ（ドロワー） -->
+  <div class="menu-drawer-backdrop" id="menuBackdrop" onclick="toggleMenuDrawer(false)"></div>
+  <aside class="menu-drawer" id="menuDrawer">
+    <div class="menu-header">
+      <div class="menu-header-title">メニュー</div>
+      <button class="btn-close-menu" onclick="toggleMenuDrawer(false)">×</button>
+    </div>
+    <ul class="menu-nav-list">
+      <li class="menu-nav-item"><button onclick="switchTabFromMenu('collection')">全生写真一覧📖</button></li>
+      <li class="menu-nav-item"><button onclick="switchTabFromMenu('missing')">未所持の生写真一覧💭</button></li>
+      <li class="menu-nav-item"><button onclick="switchTabFromMenu('trade')">トレード管理🔁</button></li>
+      <li class="menu-nav-item" style="margin-top: 10px;"><button onclick="openHelpModal()" style="background:#EFF6FF; color:#1E40AF; border-color:#BFDBFE;"> 当ツールの使い方</button></li>
+      <li class="menu-nav-item"><button onclick="openPrivacyModal()"> プライバシーポリシー</button></li>
+    </ul>
+  </aside>
+
   <div class="marquee-container">
     <div class="marquee-track" id="marqueeTrack"></div>
   </div>
 
   <div class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('collection', this)">全生写真一覧</button>
-    <button class="tab-btn" onclick="switchTab('missing', this)">未所持の生写真一覧</button>
-    <button class="tab-btn" onclick="switchTab('trade', this)">トレード管理</button>
+    <button class="tab-btn active" id="btnTabCollection" onclick="switchTab('collection', this)">全生写真一覧</button>
+    <button class="tab-btn" id="btnTabMissing" onclick="switchTab('missing', this)">未所持の生写真一覧</button>
+    <button class="tab-btn" id="btnTabTrade" onclick="switchTab('trade', this)">トレード管理</button>
   </div>
 
   <div class="container">
     <!-- 全生写真一覧タブ -->
     <div id="tab-collection">
       <div class="save-action-bar">
-        <div class="save-action-text">💡 ＋/−ボタンで枚数を変更した後は、こちらのボタンを押して保存してください。</div>
+        <div class="save-action-text">🌸 ＋/−ボタンで枚数を変更した後は、こちらのボタンを押して保存してください。</div>
         <button class="btn-save-batch" onclick="manualSaveData()">変更を保存する</button>
       </div>
 
@@ -523,7 +762,7 @@
           <div class="progress-bar-bg"><div class="progress-bar-fill funiu-fill" id="barFuniu" style="width:0%"></div></div>
         </div>
         <div class="stat-card">
-          <div class="stat-title">✨ 限定生写真コンプ率（全7種）</div>
+          <div class="stat-title">✨ 限定生写真コンプ率（全4種）</div>
           <div class="stat-value" id="statLimited">0 / 0</div>
           <div class="progress-bar-bg"><div class="progress-bar-fill limited-fill" id="barLimited" style="width:0%"></div></div>
         </div>
@@ -629,9 +868,62 @@
     </div>
   </div>
 
+  <!-- プライバシーポリシー モーダル -->
+  <div class="modal-backdrop" id="privacyModal" onclick="closePrivacyModalOnBackdrop(event)">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">プライバシーポリシー</div>
+        <button class="btn-close-menu" onclick="closePrivacyModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <h4>1. 取得する情報および利用目的</h4>
+        <p>本ツールでは、ユーザー識別および所持状況の保存を目的として、Googleアカウント認証によるユーザーID（UID）ならびに各生写真の所持数・登録画像データを収集・保存します。</p>
+
+        <h4>2. データの管理とセキュリティ</h4>
+        <p>収集されたデータはFirebase Firestoreに暗号化され安全に保管されます。本人の同意なく第三者にユーザーデータを提供・公開することはありません。また、アップロードされた画像データは軽量化（極限圧縮）され、個人特定につながる情報は除外されます。</p>
+
+        <h4>3. 画像データおよび著作権について</h4>
+        <p>当サイトは個人のファンが運営する非公式サイトです。サイト内に掲載されているすべての生写真に関する権利は、公式運営元および権利者に帰属します。</p>
+
+        <h4>4. 免責事項</h4>
+        <p>当ツールの利用により生じたトラブルや損害等について、運営者は一切の責任を負いかねますのであらかじめご了承ください。</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-auth" onclick="closePrivacyModal()">閉じる</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 使い方説明 モーダル -->
+  <div class="modal-backdrop" id="helpModal" onclick="closeHelpModalOnBackdrop(event)">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title">💡 このサイトの使い方</div>
+        <button class="btn-close-menu" onclick="closeHelpModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <h4>1. ログインしてデータをバックアップ</h4>
+        <p>画面右上の「Googleでログイン」を押すと、お使いのアカウントに所持枚数や保存画像が安全に連携されます。</p>
+
+        <h4>2. 所持枚数の記録</h4>
+        <p>各生写真カードの「＋」「−」ボタンを押して所持枚数を変更できます。「一括✓」を押すと全ポーズ所持状態になります。<br>※枚数を変更した後は、画面上部の「変更を保存する」ボタンを押して保存を行ってください。</p>
+
+        <h4>3. 自前の写真画像を登録</h4>
+        <p>「生写真画像を表示」にチェックを入れるとプレビューが表示され、「画像を登録」ボタンから自分のお持ちの写真を読み込むことができます。<br>※画像登録時は極限圧縮され、自動的に即時保存されます。</p>
+
+        <h4>4. トレード募集文の作成</h4>
+        <p>「トレード管理」タブから求める生写真にチェックを入れて「トレード文を生成」を押すと、X（旧Twitter）投稿用の交換文章を自動生成・コピーできます。</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-auth" onclick="closeHelpModal()">閉じる</button>
+      </div>
+    </div>
+  </div>
+
   <footer>
     松田里奈生写真 - 松田里奈 生写真管理ツール (非公式ファンコンテンツ)<br>
-    ※当サイトは個人が運営する非公式サイトであり、株式会社Seed & Flowerおよび関係各所とは一切関係ございません。
+    ※当サイトは個人が運営する非公式サイトであり、株式会社Seed & Flowerおよび関係各所とは一切関係ございません。<br>
+    <a onclick="openPrivacyModal()">プライバシーポリシー</a>
   </footer>
 
   <script>
@@ -644,7 +936,7 @@
       { id: 'keyaki_omitate', name: 'お見立て会衣装', kana: 'おみたてかいいしょう', group: '欅坂', type: '通常', year: 2019 },
       { id: 'keyaki_3rd_anniv_osaka', name: '3rd YEAR ANNIVERSARY LIVE 大阪公演衣装', kana: 'さーどいやーあにばーさりーらいぶおおさかこうえんいしょう', group: '欅坂', type: '通常', year: 2019 },
       { id: 'keyaki_outdoor', name: 'アウトドア衣装', kana: 'あうとどあいしょう', group: '欅坂', type: '通常', year: 2019 },
-      { id: 'keyaki_rainy_day', name: '雨の日コーディネート衣装', kana: 'あめのひこーでぃねーといしょう', group: '欅坂', type: '通常', year: 2019 },
+      { id: 'keyaki_rainy_day', name: '雨の日コーディネート衣装', kana: 'あめのひこーでぃねーとおしょう', group: '欅坂', type: '通常', year: 2019 },
       { id: 'keyaki_yukata_2019', name: '2019浴衣衣装', kana: '2019ゆかたいしょう', group: '欅坂', type: '通常', year: 2019 },
       { id: 'keyaki_summer_fes_2019', name: '2019夏フェス衣装', kana: '2019なつふぇすいしょう', group: '欅坂', type: '通常', year: 2019 },
       { id: 'keyaki_marble_harness_2019', name: '2019マーブルハーネス衣装', kana: '2019まーぶるはーねすいしょう', group: '欅坂', type: '通常', year: 2019 },
@@ -660,12 +952,12 @@
       { id: 'keyaki_live_online', name: 'Live Online,but with YOU!衣装', kana: 'らいぶおんらいんいしょう', group: '欅坂', type: '通常', year: 2020 },
       { id: 'keyaki_kohaku_2019_op', name: '紅白2019オープニング衣装', kana: 'こうはく2019おーぷにんぐいしょう', group: '欅坂', type: '通常', year: 2020 },
       { id: 'keyaki_kohaku_2019_fukyokowaon', name: '紅白2019不協和音衣装', kana: 'こうはく2019ふきょうわおんいしょう', group: '欅坂', type: '通常', year: 2020 },
-      { id: 'keyaki_autumn_casual', name: '秋の私服コーディネート衣装', kana: 'あきのしふくこーでぃねーといしょう', group: '欅坂', type: '通常', year: 2020 },
+      { id: 'keyaki_autumn_casual', name: '秋の私服コーディネート衣装', kana: 'あきのしふくこーでぃねーとおしょう', group: '欅坂', type: '通常', year: 2020 },
       { id: 'keyaki_bokuta_uso', name: '僕たちの嘘と真実', kana: 'ぼくたちのうそとしんじつ', group: '欅坂', type: '通常',allowedPoses: ['ヨリ', 'チュウ', 'ヒキ'], year: 2020 },
 
       { id: 'funiu_1st_nobodys_fault', name: '1st「Nobody\'s fault」封入', kana: '1stのーばでぃずふぉーるとふんにゅう', group: '櫻坂', type: '封入', year: 2020 },
       { id: 'sakura_nobodys_fault', name: '「Nobody\'s fault」衣装', kana: 'のーばでぃずふぉーるといしょう', group: '櫻坂', type: '通常', year: 2020 },
-      { id: 'sakura_winter_casual', name: '冬私服コーディネート衣装', kana: 'ふゆしふくこーでぃねーといしょう', group: '櫻坂', type: '通常', year: 2020 },
+      { id: 'sakura_winter_casual', name: '冬私服コーディネート衣装', kana: 'ふゆしふくこーでぃねーとおしょう', group: '櫻坂', type: '通常', year: 2020 },
       { id: 'sakura_santa_2020', name: 'クリスマスサンタ衣装', kana: 'くりすますさんたいしょう', group: '櫻坂', type: '通常', year: 2020 },
       { id: 'sakura_furisode_2021', name: '2021年振袖衣装', kana: '2021ねんふりそでいしょう', group: '櫻坂', type: '通常', year: 2021 },
       { id: 'sakura_nobodys_fault_mv', name: '「Nobody\'s fault」MVロケーション衣装', kana: 'のーばでぃずふぉーるとえむぶいろけーしょんいしょう', group: '櫻坂', type: '通常', year: 2021 },
@@ -679,7 +971,7 @@
       { id: 'sakura_ban_mv', name: '「BAN」MVロケーション衣装', kana: 'ばんえむぶいろけーしょんいしょう', group: '櫻坂', type: '通常', year: 2021 },
       { id: 'sakura_ban_tv', name: '「BAN」歌番組衣装', kana: 'ばんうたばんぐみいしょう', group: '櫻坂', type: '通常', year: 2021 },
       { id: 'sakura_yukata_2021', name: '2021年 浴衣衣装', kana: '2021ねんゆかたいしょう', group: '櫻坂', type: '通常', year: 2021 },
-      { id: 'sakura_summer_casual_2021', name: '2021年 夏私服コーディネート衣装', kana: '2021ねんなつしふくこーでぃねーといしょう', group: '櫻坂', type: '通常', year: 2021 },
+      { id: 'sakura_summer_casual_2021', name: '2021年 夏私服コーディネート衣装', kana: '2021ねんなつしふくこーでぃねーとおしょう', group: '櫻坂', type: '通常', year: 2021 },
       { id: 'funiu_3rd_nagaredama', name: '3rd「流れ弾」封入', kana: '3rdながれだまふんにゅう', group: '櫻坂', type: '封入', year: 2021 },
       { id: 'sakura_nagaredama_mv', name: '「流れ弾」MVロケーション衣装', kana: 'ながれだまえむぶいろけーしょんいしょう', group: '櫻坂', type: '通常', year: 2021 },
       { id: 'sakura_santa_2021', name: '2021年サンタ衣装', kana: '2021ねんさんたいしょう', group: '櫻坂', type: '通常', year: 2021 },
@@ -690,18 +982,18 @@
       { id: 'sakura_3rd_backs_live_mv', name: '3rd Single「BACKS LIVE!!」ビジュアルMV衣装', kana: '3rdばっくすらいぶえむぶいいしょう', group: '櫻坂', type: '通常', year: 2022 },
       { id: 'funiu_4th_samidareyo', name: '4th「五月雨よ」封入', kana: '4thさみだれよふんにゅう', group: '櫻坂', type: '封入', year: 2022 },
       { id: 'sakura_samidareyo_mv', name: '「五月雨よ」MVロケーション衣装', kana: 'さみだれよえむぶいろけーしょんいしょう', group: '櫻坂', type: '通常', year: 2022 },
-      { id: 'sakura_spring_casual_2022', name: '2022年春私服コーディネート衣装', kana: '2022ねんはるしふくこーでぃねーといしょう', group: '櫻坂', type: '通常', year: 2022 },
+      { id: 'sakura_spring_casual_2022', name: '2022年春私服コーディネート衣装', kana: '2022ねんはるしふくこーでぃねーとおしょう', group: '櫻坂', type: '通常', year: 2022 },
       { id: 'sakura_patissier', name: 'パティシエ衣装', kana: 'ぱてぃしえいしょう', group: '櫻坂', type: '通常', year: 2022 },
       { id: 'sakura_samidareyo_tv', name: '「五月雨よ」MVパフォーマンス衣装', kana: 'さみだれよえむぶいぱふぉーまんすいしょう', group: '櫻坂', type: '通常', year: 2022 },
       { id: 'sakura_boku_no_dilemma_mv', name: '「僕のジレンマ」MVロケーション衣装', kana: 'ぼくのじれんまえむぶいろけーしょんいしょう', group: '櫻坂', type: '通常', year: 2022 },
       { id: 'sakura_w_keyaki_2021_pink', name: '「W-KEYAKI FES 2021」ライブパフォーマンス ピンク衣装', kana: 'だぶりゅーけやきふぇす2021ぴんくいしょう', group: '櫻坂', type: '通常', year: 2022 },
       { id: 'sakura_risa_grad_cert', name: '「渡邊理佐 卒業コンサート」衣装', kana: 'わたなべりさそつぎょうこんさーといしょう', group: '櫻坂', type: '通常', year: 2022 },
-      { id: 'sakura_camp_2022', name: '2022年キャンプコーディネート衣装', kana: '2022ねんきゃんぷこーでぃねーといしょう', group: '櫻坂', type: '通常', year: 2022 },
+      { id: 'sakura_camp_2022', name: '2022年キャンプコーディネート衣装', kana: '2022ねんきゃんぷこーでぃねーとおしょう', group: '櫻坂', type: '通常', year: 2022 },
       { id: 'sakura_yukata_2022', name: '2022年浴衣衣装', kana: '2022ねんゆかたいしょう', group: '櫻坂', type: '通常', year: 2022 },
       { id: 'funiu_1st_album', name: '1st Album「As you know？」封入', kana: '1stあるばむあずゆーのうふんにゅう', group: '櫻坂', type: '封入', allowedPoses: ['ヨリ', 'チュウ'], year: 2022 },
       { id: 'sakura_friction_mv', name: '「摩擦係数」MV衣装', kana: 'まさつけいすうえむぶいいしょう', group: '櫻坂', type: '通常', year: 2022 },
       { id: 'sakura_1st_tour_live', name: '「1st TOUR 2021」ライブ衣装', kana: '1stつあーらいぶいしょう', group: '櫻坂', type: '通常', year: 2022 },
-      { id: 'sakura_autumn_casual_2022', name: '2022年秋私服コーディネート衣装', kana: '2022ねんあきしふくこーでぃねーといしょう', group: '櫻坂', type: '通常', year: 2022 },
+      { id: 'sakura_autumn_casual_2022', name: '2022年秋私服コーディネート衣装', kana: '2022ねんあきしふくこーでぃねーとおしょう', group: '櫻坂', type: '通常', year: 2022 },
       { id: 'sakura_halloween_2022', name: '2022年ハロウィン衣装', kana: '2022ねんはろうぃんいしょう', group: '櫻坂', type: '通常', year: 2022 },
       { id: 'sakura_santa_2022', name: '2022年クリスマスサンタ衣装', kana: '2022ねんくりすますさんたいしょう', group: '櫻坂', type: '通常', year: 2022 },
       { id: 'sakura_w_keyaki_2022_pink', name: '「W-KEYAKI FES 2022」ライブピンク衣装', kana: 'だぶりゅーけやきふぇす2022ぴんくいしょう', group: '櫻坂', type: '通常', year: 2022 },
@@ -836,7 +1128,7 @@
       { id: 'sakura_5th_tour_dome_stripe', name: '5th TOUR2025 "Addiction" ドーム公演 ストライプ衣装', kana: '5thつあーどーむこうえんすとらいぷいしょう', group: '櫻坂', type: '通常', year: 2026 },
       { id: 'sakura_5th_anniv_live_outfit', name: '5th YEAR ANNIVERSARY LIVE ライブ衣装', kana: '5thいやーあにばーさりーらいぶいしょう', group: '櫻坂', type: '通常', year: 2026 },
       { id: 'sakura_vitamin_coord', name: 'ビタミンコーデ', kana: 'びたみんこーで', group: '櫻坂', type: '通常', year: 2026 },
-      { id: 'funiu_16th_ai_must_be', name: '16th「愛 MUST BE」封入', kana: '16thあいますとびーふんにゅう', group: '櫻坂', type: '封入', year: 2026 },
+      { id: 'funiu_16th_ai_must_be', name: '16th「愛 MUST BE」封入', kana: '16thあいきますとびーふんにゅう', group: '櫻坂', type: '封入', year: 2026 },
       { id: 'sakura_5th_anniv_op', name: '5th YEAR ANNIVERSARY LIVE オープニング衣装', kana: '5thいやーあにばーさりーらいぶおーぷにんぐいしょう', group: '櫻坂', type: '通常', year: 2026 },
       { id: 'sakura_5th_anniv_bw', name: '5th YEAR ANNIVERSARY LIVE 白黒衣装', kana: '5thいやーあにばーさりーらいぶしろくろいしょう', group: '櫻坂', type: '通常', year: 2026 },
       { id: 'sakura_year_end_2025_lightblue', name: '2025年 年末水色衣装', kana: '2025ねんねんまつみずいろいしょう', group: '櫻坂', type: '通常', year: 2026 },
@@ -861,6 +1153,65 @@
     let currentSortOrder = 'asc';
     let currentYearFilter = 'all';
     let imageDisplayStates = {};
+
+    /* 無断画像保存・右クリック・長押し無効化処理 */
+    document.addEventListener('contextmenu', function(e) {
+      if (e.target.tagName === 'IMG' || e.target.closest('.pose-img-wrapper') || e.target.closest('.marquee-card')) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    /* タイトル押下時にトップへ戻る処理 */
+    function scrollToTop(e) {
+      if (e) e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      switchTab('collection', document.getElementById('btnTabCollection'));
+    }
+
+    /* 左上メニューの開閉処理 */
+    function toggleMenuDrawer(open) {
+      const backdrop = document.getElementById('menuBackdrop');
+      const drawer = document.getElementById('menuDrawer');
+      if (open) {
+        backdrop.classList.add('active');
+        drawer.classList.add('active');
+      } else {
+        backdrop.classList.remove('active');
+        drawer.classList.remove('active');
+      }
+    }
+
+    function switchTabFromMenu(tabName) {
+      toggleMenuDrawer(false);
+      let btnEl = document.getElementById('btnTabCollection');
+      if (tabName === 'missing') btnEl = document.getElementById('btnTabMissing');
+      if (tabName === 'trade') btnEl = document.getElementById('btnTabTrade');
+      switchTab(tabName, btnEl);
+    }
+
+    /* モーダル表示処理 */
+    function openPrivacyModal() {
+      toggleMenuDrawer(false);
+      document.getElementById('privacyModal').classList.add('active');
+    }
+    function closePrivacyModal() {
+      document.getElementById('privacyModal').classList.remove('active');
+    }
+    function closePrivacyModalOnBackdrop(e) {
+      if (e.target.id === 'privacyModal') closePrivacyModal();
+    }
+
+    function openHelpModal() {
+      toggleMenuDrawer(false);
+      document.getElementById('helpModal').classList.add('active');
+    }
+    function closeHelpModal() {
+      document.getElementById('helpModal').classList.remove('active');
+    }
+    function closeHelpModalOnBackdrop(e) {
+      if (e.target.id === 'helpModal') closeHelpModal();
+    }
 
     function toHiragana(str) {
       return str.replace(/[\u30a1-\u30f6]/g, function(match) {
@@ -1132,7 +1483,6 @@
       updateDashboard();
     }
 
-    // 画像の極限圧縮関数 (長辺最大300px・画質0.2)
     function compressImage(file, maxDimension = 300, quality = 0.2) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -1181,7 +1531,6 @@
           renderMarquee();
           hideLoader();
 
-          // 画像登録時は即時保存
           if (typeof window.saveUserData === 'function') {
             await window.saveUserData(true);
           }
@@ -1304,7 +1653,7 @@
         document.getElementById('tab-missing').style.display = tab === 'missing' ? 'block' : 'none';
         document.getElementById('tab-trade').style.display = tab === 'trade' ? 'block' : 'none';
         document.querySelectorAll('.nav-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        if (btn) btn.classList.add('active');
         if (tab === 'missing') renderMissingPhotos();
         if (tab === 'trade') renderTradePage();
         hideLoader();
